@@ -1,5 +1,5 @@
 import fastf1
-from fastf1.plotting import TEAM_COLORS
+import fastf1.plotting
 
 
 def get_race_replay_telemetry(year, gp, session_type, drivers):
@@ -12,11 +12,17 @@ def get_race_replay_telemetry(year, gp, session_type, drivers):
         try:
             lap = session.laps.pick_drivers(code).pick_fastest()
             tel = lap.get_telemetry().add_distance()
+            team_name = session.get_driver(code).get("TeamName", "Unknown")
+            try:
+                team_color = fastf1.plotting.get_team_color(team_name, session)
+            except:
+                team_color = "#999999"
+            
             telemetry_data[code] = {
                 "X": tel['X'].tolist(),
                 "Y": tel['Y'].tolist(),
-                "team": session.get_driver(code).get("TeamName", "Unknown"),
-                "color": TEAM_COLORS.get(session.get_driver(code).get("TeamName", "Unknown"), "#999999"),
+                "team": team_name,
+                "color": team_color,
             }
         except:
             telemetry_data[code] = {"X": [], "Y": []}
