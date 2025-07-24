@@ -2,7 +2,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import fastf1
-from fastf1.plotting import TEAM_COLORS
+import fastf1.plotting
+import pandas as pd
 from datetime import datetime
 from graphs.race_replay import get_race_replay_telemetry
 
@@ -50,7 +51,10 @@ def get_drivers():
     for drv in session.drivers:
         info = session.get_driver(drv)
         team = info.get('TeamName', 'Unknown')
-        color = TEAM_COLORS.get(team, '#999999')
+        try:
+            color = fastf1.plotting.get_team_color(team, session)
+        except:
+            color = '#999999'
         name = info.get('FullName') or f"{info.get('GivenName', '')} {info.get('FamilyName', '')}".strip()
         drivers.append({
             "code": drv,
